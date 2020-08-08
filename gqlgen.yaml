@@ -15,8 +15,7 @@ resolver:
   package: resolver
 
 autobind:
-  - "github.com/PatrickKvartsianyi/image-processing-service/graphql/model"
-  -
+  - "github.com/PatrickKvartsianyi/image-processing-service/graph/model"
 models:
   ID:
     model:

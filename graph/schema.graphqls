@@ -1,0 +1,31 @@
+scalar Time
+scalar Upload
+
+type Image {
+    id: ID!
+    path: String!
+    extention: String!
+    size: Int!
+    ts: Time
+    variety: [Resized!]!
+}
+
+type Resized {
+    path: String!
+    width: Int!
+    height: Int!
+}
+
+input SizeInput {
+    width: Int!
+    height: Int!
+}
+
+type Query {
+    images(limit: Int! = 25, offset: Int! = 0): [Image!]!  # list of images
+}
+
+type Mutation {
+    uploadImage(image: Upload!, patameters: [SizeInput!]!): Image!
+    resizeImage(id: ID!, patameters: [SizeInput!]!): Image!
+}
