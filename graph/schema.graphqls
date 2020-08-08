@@ -1,22 +1,22 @@
 scalar Time
 scalar Upload
 
-type Image {
+type Image @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service/model.Image"){
     id: ID!
     path: String!
-    extention: String!
+    extension: String!
     size: Int!
     ts: Time
-    variety: [Resized!]!
+    variety: [Resized!]! @goField(forceResolver: true)
 }
 
-type Resized {
+type Resized @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service/model.Resized"){
     path: String!
     width: Int!
     height: Int!
 }
 
-input SizeInput {
+input SizeInput @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service/model.SizeInput"){
     width: Int!
     height: Int!
 }
@@ -26,6 +26,16 @@ type Query {
 }
 
 type Mutation {
-    uploadImage(image: Upload!, patameters: [SizeInput!]!): Image!
-    resizeImage(id: ID!, patameters: [SizeInput!]!): Image!
+    uploadImage(image: Upload!, parameters: [SizeInput!]!): Image!
+    resizeImage(id: ID!, parameters: [SizeInput!]!): Image!
 }
+
+directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION
+    | FIELD_DEFINITION
+
+directive @goModel(model: String, models: [String!]) on OBJECT
+    | INPUT_OBJECT
+    | SCALAR
+    | ENUM
+    | INTERFACE
+    | UNION

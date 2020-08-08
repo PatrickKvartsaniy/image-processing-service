@@ -9,14 +9,18 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/PatrickKvartsaniy/image-processing-service/graph/generated"
-	"github.com/PatrickKvartsaniy/image-processing-service/graph/model"
+	"github.com/PatrickKvartsaniy/image-processing-service/model"
 )
 
-func (r *mutationResolver) UploadImage(ctx context.Context, image graphql.Upload, patameters []*model.SizeInput) (*model.Image, error) {
+func (r *imageResolver) Variety(ctx context.Context, obj *model.Image) ([]*model.Resized, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) ResizeImage(ctx context.Context, id string, patameters []*model.SizeInput) (*model.Image, error) {
+func (r *mutationResolver) UploadImage(ctx context.Context, image graphql.Upload, parameters []*model.SizeInput) (*model.Image, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) ResizeImage(ctx context.Context, id string, parameters []*model.SizeInput) (*model.Image, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -24,24 +28,15 @@ func (r *queryResolver) Images(ctx context.Context, limit int, offset int) ([]*m
 	panic(fmt.Errorf("not implemented"))
 }
 
-// Mutation returns generated.MutationResolver implementation.
+// Image returns generated1.ImageResolver implementation.
+func (r *Resolver) Image() generated.ImageResolver { return &imageResolver{r} }
+
+// Mutation returns generated1.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
-// Query returns generated.QueryResolver implementation.
+// Query returns generated1.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+type imageResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *mutationResolver) Upload(ctx context.Context, image graphql.Upload, patameters []*model.SizeInput) (*model.Image, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *mutationResolver) Resize(ctx context.Context, imageID string, patameters []*model.SizeInput) (*model.Image, error) {
-	panic(fmt.Errorf("not implemented"))
-}
