@@ -1,13 +1,15 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Image struct {
 	ID      string     `json:"id" bson:"_id"`
 	Path    string     `json:"path" bson:"path"`
 	Type    string     `json:"extension" bson:"extension"`
 	Size    int        `json:"size" bson:"size"`
-	Ts      *time.Time `json:"ts" bson:"ts"`
+	Ts      time.Time `json:"ts" bson:"ts"`
 	Variety []Resized  `json:"variety" bson:"variety"`
 }
 

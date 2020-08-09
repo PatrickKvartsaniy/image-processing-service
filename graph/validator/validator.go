@@ -1,8 +1,8 @@
 package validator
 
 import (
-	"fmt"
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/PatrickKvartsaniy/image-processing-service/graph/errors"
 	"github.com/PatrickKvartsaniy/image-processing-service/model"
 )
 
@@ -18,17 +18,17 @@ func NewFileValidator() *Validator {
 
 func (v Validator) ValidateFile(in graphql.Upload) error {
 	if !isImage(in.ContentType) {
-		return fmt.Errorf("unsupported file type")
+		return errors.UnsupportedFile
 	}
 	if in.Size > maxSize {
-		return fmt.Errorf("image size too large")
+		return errors.TooLarge
 	}
 	return nil
 }
 
 func (v Validator) ValidateInput(in model.SizeInput) error {
 	if !in.Valid() {
-		return fmt.Errorf("invalid input parameters")
+		return errors.InvalidInput
 	}
 	return nil
 }

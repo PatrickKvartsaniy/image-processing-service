@@ -21,20 +21,16 @@ type (
 	}
 	Repository interface {
 		GetImage(ctx context.Context, id string) (*model.Image, error)
-		GetImageVariety(ctx context.Context, id string) ([]*model.Resized, error)
 		GetMultipleImages(ctx context.Context, limit, offset int) ([]*model.Image, error)
-		SaveImage(ctx context.Context, version int, image model.Image) error
+		SaveImage(ctx context.Context, image model.Image) error
 	}
-
 	Storage interface {
 		Read(ctx context.Context, path string) (io.Reader, error)
 		Upload(ctx context.Context, data io.Reader) (string, error)
 	}
-
 	Processor interface {
-		Resize(ctx context.Context, data io.Reader, output io.Writer, width, height int) error
+		Resize(ctx context.Context, data io.Reader, output io.Writer, parameters model.SizeInput) error
 	}
-
 	Validator interface {
 		ValidateFile(in graphql.Upload) error
 		ValidateInput(input model.SizeInput) error
