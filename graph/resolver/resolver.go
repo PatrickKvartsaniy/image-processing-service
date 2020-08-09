@@ -21,8 +21,9 @@ type (
 	}
 	Repository interface {
 		GetImage(ctx context.Context, id string) (*model.Image, error)
-		GetMultipleImages(ctx context.Context, limit, offset int) ([]*model.Image, error)
+		GetMultipleImages(ctx context.Context, limit, offset int64) ([]*model.Image, error)
 		SaveImage(ctx context.Context, image *model.Image) error
+		UpdateImage(ctx context.Context, image *model.Image) error
 	}
 	Storage interface {
 		Read(ctx context.Context, path string) (io.Reader, error)
@@ -37,11 +38,11 @@ type (
 	}
 )
 
-func NewGraphqlResolver(s Storage, p Processor, r Repository) *Resolver {
+func NewGraphqlResolver(s Storage, p Processor, r Repository, imageSizeLimit int64) *Resolver {
 	return &Resolver{
 		storage:   s,
 		processor: p,
 		repo:      r,
-		validator: validator.NewFileValidator(),
+		validator: validator.NewFileValidator(imageSizeLimit),
 	}
 }

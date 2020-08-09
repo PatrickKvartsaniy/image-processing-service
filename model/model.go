@@ -8,9 +8,9 @@ type Image struct {
 	ID      string    `json:"id" bson:"_id"`
 	Path    string    `json:"path" bson:"path"`
 	Type    string    `json:"extension" bson:"extension"`
-	Size    int       `json:"size" bson:"size"`
+	Size    int64     `json:"size" bson:"size"`
 	Ts      time.Time `json:"ts" bson:"ts"`
-	Version int       `json:"version" bson:"version"`
+	Version int64     `json:"version" bson:"version"`
 	Variety []Resized `json:"variety" bson:"variety"`
 }
 
@@ -28,13 +28,13 @@ func (i *Image) IncreaseVersion() {
 
 type Resized struct {
 	Path   string `json:"path" bson:"path"`
-	Width  int    `json:"width" bson:"width"`
-	Height int    `json:"height" bson:"height"`
+	Width  int64  `json:"width" bson:"width"`
+	Height int64  `json:"height" bson:"height"`
 }
 
 type SizeInput struct {
-	Width  int `json:"width"`
-	Height int `json:"height"`
+	Width  int64 `json:"width"`
+	Height int64 `json:"height"`
 }
 
 func (si SizeInput) Valid() bool {

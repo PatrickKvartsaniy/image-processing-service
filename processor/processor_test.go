@@ -17,7 +17,7 @@ func TestProcessor_Resize(t *testing.T) {
 
 	var b bytes.Buffer
 	params := model.SizeInput{
-		Width: 100,
+		Width:  100,
 		Height: 100,
 	}
 

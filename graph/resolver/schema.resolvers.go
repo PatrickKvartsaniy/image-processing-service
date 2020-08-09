@@ -42,7 +42,7 @@ func (r *mutationResolver) Upload(ctx context.Context, image graphql.Upload, par
 	img := &model.Image{
 		Path: path,
 		Type: image.ContentType,
-		Size: int(image.Size),
+		Size: image.Size,
 		Ts:   time.Now(),
 	}
 	img.NewSize(resizedPath, parameters)
@@ -81,7 +81,7 @@ func (r *mutationResolver) Resize(ctx context.Context, id string, parameters mod
 	image.NewSize(resizedPath, parameters)
 	image.IncreaseVersion()
 
-	if err = r.repo.SaveImage(ctx, image); err != nil {
+	if err = r.repo.UpdateImage(ctx, image); err != nil {
 		return nil, fmt.Errorf("saving image: %w", err)
 	}
 
@@ -89,7 +89,7 @@ func (r *mutationResolver) Resize(ctx context.Context, id string, parameters mod
 }
 
 func (r *queryResolver) Images(ctx context.Context, limit int, offset int) ([]*model.Image, error) {
-	return r.repo.GetMultipleImages(ctx, limit, offset)
+	return r.repo.GetMultipleImages(ctx, int64(limit), int64(offset))
 }
 
 // Mutation returns generated.MutationResolver implementation.

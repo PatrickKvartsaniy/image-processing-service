@@ -2,25 +2,28 @@ package validator
 
 import (
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/PatrickKvartsaniy/image-processing-service/graph/errors"
+	"github.com/PatrickKvartsaniy/image-processing-service/errors"
 	"github.com/PatrickKvartsaniy/image-processing-service/model"
 )
 
 var allowedTypes = [5]string{"image/jpeg", "image/gif", "image/png", "image/pdf", "image/ico"}
 
-const maxSize = 10 * 1024 * 1024 // 5mb
+type Validator struct {
+	maxImageSize int64
+}
 
-type Validator struct{}
-
-func NewFileValidator() *Validator {
-	return &Validator{}
+// maxImageSize - size in megabytes
+func NewFileValidator(maxImageSize int64) *Validator {
+	return &Validator{
+		maxImageSize: maxImageSize * 1024 * 1024,
+	}
 }
 
 func (v Validator) ValidateFile(in graphql.Upload) error {
 	if !isImage(in.ContentType) {
 		return errors.UnsupportedFile
 	}
-	if in.Size > maxSize {
+	if in.Size > v.maxImageSize {
 		return errors.TooLarge
 	}
 	return nil
