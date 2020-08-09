@@ -36,7 +36,6 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	Image() ImageResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -46,17 +45,17 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Image struct {
-		Extension func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Path      func(childComplexity int) int
-		Size      func(childComplexity int) int
-		Ts        func(childComplexity int) int
-		Variety   func(childComplexity int) int
+		ID      func(childComplexity int) int
+		Path    func(childComplexity int) int
+		Size    func(childComplexity int) int
+		Ts      func(childComplexity int) int
+		Type    func(childComplexity int) int
+		Variety func(childComplexity int) int
 	}
 
 	Mutation struct {
-		ResizeImage func(childComplexity int, id string, parameters []*model.SizeInput) int
-		UploadImage func(childComplexity int, image graphql.Upload, parameters []*model.SizeInput) int
+		Resize func(childComplexity int, id string, parameters model.SizeInput) int
+		Upload func(childComplexity int, image graphql.Upload, parameters model.SizeInput) int
 	}
 
 	Query struct {
@@ -70,12 +69,9 @@ type ComplexityRoot struct {
 	}
 }
 
-type ImageResolver interface {
-	Variety(ctx context.Context, obj *model.Image) ([]*model.Resized, error)
-}
 type MutationResolver interface {
-	UploadImage(ctx context.Context, image graphql.Upload, parameters []*model.SizeInput) (*model.Image, error)
-	ResizeImage(ctx context.Context, id string, parameters []*model.SizeInput) (*model.Image, error)
+	Upload(ctx context.Context, image graphql.Upload, parameters model.SizeInput) (*model.Image, error)
+	Resize(ctx context.Context, id string, parameters model.SizeInput) (*model.Image, error)
 }
 type QueryResolver interface {
 	Images(ctx context.Context, limit int, offset int) ([]*model.Image, error)
@@ -95,13 +91,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
-
-	case "Image.extension":
-		if e.complexity.Image.Extension == nil {
-			break
-		}
-
-		return e.complexity.Image.Extension(childComplexity), true
 
 	case "Image.id":
 		if e.complexity.Image.ID == nil {
@@ -131,6 +120,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Image.Ts(childComplexity), true
 
+	case "Image.type":
+		if e.complexity.Image.Type == nil {
+			break
+		}
+
+		return e.complexity.Image.Type(childComplexity), true
+
 	case "Image.variety":
 		if e.complexity.Image.Variety == nil {
 			break
@@ -138,29 +134,29 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Image.Variety(childComplexity), true
 
-	case "Mutation.resizeImage":
-		if e.complexity.Mutation.ResizeImage == nil {
+	case "Mutation.resize":
+		if e.complexity.Mutation.Resize == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_resizeImage_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_resize_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.ResizeImage(childComplexity, args["id"].(string), args["parameters"].([]*model.SizeInput)), true
+		return e.complexity.Mutation.Resize(childComplexity, args["id"].(string), args["parameters"].(model.SizeInput)), true
 
-	case "Mutation.uploadImage":
-		if e.complexity.Mutation.UploadImage == nil {
+	case "Mutation.upload":
+		if e.complexity.Mutation.Upload == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_uploadImage_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_upload_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UploadImage(childComplexity, args["image"].(graphql.Upload), args["parameters"].([]*model.SizeInput)), true
+		return e.complexity.Mutation.Upload(childComplexity, args["image"].(graphql.Upload), args["parameters"].(model.SizeInput)), true
 
 	case "Query.images":
 		if e.complexity.Query.Images == nil {
@@ -265,10 +261,10 @@ scalar Upload
 type Image @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service/model.Image"){
     id: ID!
     path: String!
-    extension: String!
+    type: String!
     size: Int!
     ts: Time
-    variety: [Resized!]! @goField(forceResolver: true)
+    variety: [Resized!]!
 }
 
 type Resized @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service/model.Resized"){
@@ -287,8 +283,8 @@ type Query {
 }
 
 type Mutation {
-    uploadImage(image: Upload!, parameters: [SizeInput!]!): Image!
-    resizeImage(id: ID!, parameters: [SizeInput!]!): Image!
+    upload(image: Upload!, parameters: SizeInput!): Image!
+    resize(id: ID!, parameters: SizeInput!): Image!
 }
 
 directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION
@@ -308,7 +304,7 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_resizeImage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_resize_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -319,9 +315,9 @@ func (ec *executionContext) field_Mutation_resizeImage_args(ctx context.Context,
 		}
 	}
 	args["id"] = arg0
-	var arg1 []*model.SizeInput
+	var arg1 model.SizeInput
 	if tmp, ok := rawArgs["parameters"]; ok {
-		arg1, err = ec.unmarshalNSizeInput2ᚕᚖgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐSizeInputᚄ(ctx, tmp)
+		arg1, err = ec.unmarshalNSizeInput2githubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐSizeInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -330,7 +326,7 @@ func (ec *executionContext) field_Mutation_resizeImage_args(ctx context.Context,
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_uploadImage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_upload_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 graphql.Upload
@@ -341,9 +337,9 @@ func (ec *executionContext) field_Mutation_uploadImage_args(ctx context.Context,
 		}
 	}
 	args["image"] = arg0
-	var arg1 []*model.SizeInput
+	var arg1 model.SizeInput
 	if tmp, ok := rawArgs["parameters"]; ok {
-		arg1, err = ec.unmarshalNSizeInput2ᚕᚖgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐSizeInputᚄ(ctx, tmp)
+		arg1, err = ec.unmarshalNSizeInput2githubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐSizeInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -492,7 +488,7 @@ func (ec *executionContext) _Image_path(ctx context.Context, field graphql.Colle
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Image_extension(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
+func (ec *executionContext) _Image_type(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -509,7 +505,7 @@ func (ec *executionContext) _Image_extension(ctx context.Context, field graphql.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Extension, nil
+		return obj.Type, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -602,13 +598,13 @@ func (ec *executionContext) _Image_variety(ctx context.Context, field graphql.Co
 		Object:   "Image",
 		Field:    field,
 		Args:     nil,
-		IsMethod: true,
+		IsMethod: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Image().Variety(rctx, obj)
+		return obj.Variety, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -620,12 +616,12 @@ func (ec *executionContext) _Image_variety(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Resized)
+	res := resTmp.([]model.Resized)
 	fc.Result = res
-	return ec.marshalNResized2ᚕᚖgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐResizedᚄ(ctx, field.Selections, res)
+	return ec.marshalNResized2ᚕgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐResizedᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_uploadImage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_upload(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -641,7 +637,7 @@ func (ec *executionContext) _Mutation_uploadImage(ctx context.Context, field gra
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_uploadImage_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_upload_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -649,7 +645,7 @@ func (ec *executionContext) _Mutation_uploadImage(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UploadImage(rctx, args["image"].(graphql.Upload), args["parameters"].([]*model.SizeInput))
+		return ec.resolvers.Mutation().Upload(rctx, args["image"].(graphql.Upload), args["parameters"].(model.SizeInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -666,7 +662,7 @@ func (ec *executionContext) _Mutation_uploadImage(ctx context.Context, field gra
 	return ec.marshalNImage2ᚖgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐImage(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_resizeImage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_resize(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -682,7 +678,7 @@ func (ec *executionContext) _Mutation_resizeImage(ctx context.Context, field gra
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_resizeImage_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_resize_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -690,7 +686,7 @@ func (ec *executionContext) _Mutation_resizeImage(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ResizeImage(rctx, args["id"].(string), args["parameters"].([]*model.SizeInput))
+		return ec.resolvers.Mutation().Resize(rctx, args["id"].(string), args["parameters"].(model.SizeInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2020,39 +2016,30 @@ func (ec *executionContext) _Image(ctx context.Context, sel ast.SelectionSet, ob
 		case "id":
 			out.Values[i] = ec._Image_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "path":
 			out.Values[i] = ec._Image_path(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
-		case "extension":
-			out.Values[i] = ec._Image_extension(ctx, field, obj)
+		case "type":
+			out.Values[i] = ec._Image_type(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "size":
 			out.Values[i] = ec._Image_size(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "ts":
 			out.Values[i] = ec._Image_ts(ctx, field, obj)
 		case "variety":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Image_variety(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
+			out.Values[i] = ec._Image_variety(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2079,13 +2066,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "uploadImage":
-			out.Values[i] = ec._Mutation_uploadImage(ctx, field)
+		case "upload":
+			out.Values[i] = ec._Mutation_upload(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "resizeImage":
-			out.Values[i] = ec._Mutation_resizeImage(ctx, field)
+		case "resize":
+			out.Values[i] = ec._Mutation_resize(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2523,7 +2510,7 @@ func (ec *executionContext) marshalNResized2githubᚗcomᚋPatrickKvartsaniyᚋi
 	return ec._Resized(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNResized2ᚕᚖgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐResizedᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Resized) graphql.Marshaler {
+func (ec *executionContext) marshalNResized2ᚕgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐResizedᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Resized) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2547,7 +2534,7 @@ func (ec *executionContext) marshalNResized2ᚕᚖgithubᚗcomᚋPatrickKvartsan
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNResized2ᚖgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐResized(ctx, sel, v[i])
+			ret[i] = ec.marshalNResized2githubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐResized(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2560,46 +2547,8 @@ func (ec *executionContext) marshalNResized2ᚕᚖgithubᚗcomᚋPatrickKvartsan
 	return ret
 }
 
-func (ec *executionContext) marshalNResized2ᚖgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐResized(ctx context.Context, sel ast.SelectionSet, v *model.Resized) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Resized(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNSizeInput2githubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐSizeInput(ctx context.Context, v interface{}) (model.SizeInput, error) {
 	return ec.unmarshalInputSizeInput(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNSizeInput2ᚕᚖgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐSizeInputᚄ(ctx context.Context, v interface{}) ([]*model.SizeInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.SizeInput, len(vSlice))
-	for i := range vSlice {
-		res[i], err = ec.unmarshalNSizeInput2ᚖgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐSizeInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalNSizeInput2ᚖgithubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐSizeInput(ctx context.Context, v interface{}) (*model.SizeInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNSizeInput2githubᚗcomᚋPatrickKvartsaniyᚋimageᚑprocessingᚑserviceᚋmodelᚐSizeInput(ctx, v)
-	return &res, err
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

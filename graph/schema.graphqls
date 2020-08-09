@@ -4,10 +4,10 @@ scalar Upload
 type Image @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service/model.Image"){
     id: ID!
     path: String!
-    extension: String!
+    type: String!
     size: Int!
     ts: Time
-    variety: [Resized!]! @goField(forceResolver: true)
+    variety: [Resized!]!
 }
 
 type Resized @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service/model.Resized"){
@@ -26,8 +26,8 @@ type Query {
 }
 
 type Mutation {
-    uploadImage(image: Upload!, parameters: [SizeInput!]!): Image!
-    resizeImage(id: ID!, parameters: [SizeInput!]!): Image!
+    upload(image: Upload!, parameters: SizeInput!): Image!
+    resize(id: ID!, parameters: SizeInput!): Image!
 }
 
 directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION
