@@ -51,6 +51,7 @@ type ComplexityRoot struct {
 		Ts      func(childComplexity int) int
 		Type    func(childComplexity int) int
 		Variety func(childComplexity int) int
+		Version func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -133,6 +134,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Image.Variety(childComplexity), true
+
+	case "Image.version":
+		if e.complexity.Image.Version == nil {
+			break
+		}
+
+		return e.complexity.Image.Version(childComplexity), true
 
 	case "Mutation.resize":
 		if e.complexity.Mutation.Resize == nil {
@@ -263,7 +271,8 @@ type Image @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service
     path: String!
     type: String!
     size: Int!
-    ts: Time
+    ts: Time!
+    version: Int!
     variety: [Resized!]!
 }
 
@@ -580,11 +589,48 @@ func (ec *executionContext) _Image_ts(ctx context.Context, field graphql.Collect
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*time.Time)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Image_version(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Image",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Version, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Image_variety(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
@@ -2035,6 +2081,14 @@ func (ec *executionContext) _Image(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "ts":
 			out.Values[i] = ec._Image_ts(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "version":
+			out.Values[i] = ec._Image_version(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "variety":
 			out.Values[i] = ec._Image_variety(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2565,6 +2619,20 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	return graphql.UnmarshalTime(v)
+}
+
+func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	res := graphql.MarshalTime(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {
 	return graphql.UnmarshalUpload(v)
 }
@@ -2881,29 +2949,6 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return ec.marshalOString2string(ctx, sel, *v)
-}
-
-func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
-	return graphql.UnmarshalTime(v)
-}
-
-func (ec *executionContext) marshalOTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
-	return graphql.MarshalTime(v)
-}
-
-func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalOTime2timeᚐTime(ctx, v)
-	return &res, err
-}
-
-func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec.marshalOTime2timeᚐTime(ctx, sel, *v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

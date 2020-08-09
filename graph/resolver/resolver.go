@@ -22,7 +22,7 @@ type (
 	Repository interface {
 		GetImage(ctx context.Context, id string) (*model.Image, error)
 		GetMultipleImages(ctx context.Context, limit, offset int) ([]*model.Image, error)
-		SaveImage(ctx context.Context, image model.Image) error
+		SaveImage(ctx context.Context, image *model.Image) error
 	}
 	Storage interface {
 		Read(ctx context.Context, path string) (io.Reader, error)

@@ -6,18 +6,17 @@ import (
 	"io"
 )
 
-type Processor struct {}
+type Processor struct{}
 
-func NewImageProcessor()  *Processor{
+func NewImageProcessor() *Processor {
 	return &Processor{}
 }
 
-func (p Processor) Resize(in io.Reader, out io.Writer, params model.SizeInput)  error {
+func (p Processor) Resize(in io.Reader, out io.Writer, params model.SizeInput) error {
 	original, err := imaging.Decode(in, imaging.AutoOrientation(true))
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	resized := imaging.Resize(original, params.Width, params.Height, imaging.Lanczos)
 	return imaging.Encode(out, resized, imaging.PNG)
 }
-

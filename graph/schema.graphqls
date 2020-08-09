@@ -6,7 +6,8 @@ type Image @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service
     path: String!
     type: String!
     size: Int!
-    ts: Time
+    ts: Time!
+    version: Int!
     variety: [Resized!]!
 }
 

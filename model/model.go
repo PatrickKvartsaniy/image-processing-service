@@ -5,12 +5,25 @@ import (
 )
 
 type Image struct {
-	ID      string     `json:"id" bson:"_id"`
-	Path    string     `json:"path" bson:"path"`
-	Type    string     `json:"extension" bson:"extension"`
-	Size    int        `json:"size" bson:"size"`
+	ID      string    `json:"id" bson:"_id"`
+	Path    string    `json:"path" bson:"path"`
+	Type    string    `json:"extension" bson:"extension"`
+	Size    int       `json:"size" bson:"size"`
 	Ts      time.Time `json:"ts" bson:"ts"`
-	Variety []Resized  `json:"variety" bson:"variety"`
+	Version int       `json:"version" bson:"version"`
+	Variety []Resized `json:"variety" bson:"variety"`
+}
+
+func (i *Image) NewSize(path string, params SizeInput) {
+	i.Variety = append(i.Variety, Resized{
+		Path:   path,
+		Width:  params.Width,
+		Height: params.Height,
+	})
+}
+
+func (i *Image) IncreaseVersion() {
+	i.Version++
 }
 
 type Resized struct {

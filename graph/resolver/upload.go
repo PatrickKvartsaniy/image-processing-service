@@ -7,6 +7,6 @@ import (
 
 func copyReader(in io.Reader) (io.Reader, io.Reader) {
 	var b bytes.Buffer
-	cc := io.TeeReader(in, &b)
-	return cc, &b
+	r := io.TeeReader(in, &b)
+	return r, &b
 }
