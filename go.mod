@@ -11,4 +11,5 @@ require (
 	github.com/stretchr/testify v1.6.0
 	github.com/vektah/gqlparser/v2 v2.0.1
 	go.mongodb.org/mongo-driver v1.3.6
+	google.golang.org/grpc v1.29.1
 )
