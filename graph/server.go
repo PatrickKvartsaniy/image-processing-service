@@ -14,11 +14,11 @@ import (
 )
 
 type Server struct {
-		http      *http.Server
-		resolver  generated.ResolverRoot
-		runErr    error
-		readiness bool
-	}
+	http      *http.Server
+	resolver  generated.ResolverRoot
+	runErr    error
+	readiness bool
+}
 
 func CreateAndRun(port int, resolver generated.ResolverRoot) *Server {
 	service := &Server{

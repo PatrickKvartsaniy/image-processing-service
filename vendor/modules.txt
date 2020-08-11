@@ -29,6 +29,8 @@ github.com/davecgh/go-spew/spew
 # github.com/disintegration/imaging v1.6.2
 ## explicit
 github.com/disintegration/imaging
+# github.com/fsnotify/fsnotify v1.4.7
+github.com/fsnotify/fsnotify
 # github.com/go-stack/stack v1.8.0
 github.com/go-stack/stack
 # github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e
@@ -46,11 +48,22 @@ github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/snappy
 # github.com/googleapis/gax-go/v2 v2.0.5
 github.com/googleapis/gax-go/v2
-# github.com/gorilla/websocket v1.2.0
+# github.com/gorilla/websocket v1.4.2
 github.com/gorilla/websocket
 # github.com/hashicorp/golang-lru v0.5.1
 github.com/hashicorp/golang-lru
 github.com/hashicorp/golang-lru/simplelru
+# github.com/hashicorp/hcl v1.0.0
+github.com/hashicorp/hcl
+github.com/hashicorp/hcl/hcl/ast
+github.com/hashicorp/hcl/hcl/parser
+github.com/hashicorp/hcl/hcl/printer
+github.com/hashicorp/hcl/hcl/scanner
+github.com/hashicorp/hcl/hcl/strconv
+github.com/hashicorp/hcl/hcl/token
+github.com/hashicorp/hcl/json/parser
+github.com/hashicorp/hcl/json/scanner
+github.com/hashicorp/hcl/json/token
 # github.com/jstemmer/go-junit-report v0.9.1
 github.com/jstemmer/go-junit-report
 github.com/jstemmer/go-junit-report/formatter
@@ -63,8 +76,12 @@ github.com/klauspost/compress/zstd
 github.com/klauspost/compress/zstd/internal/xxhash
 # github.com/konsorten/go-windows-terminal-sequences v1.0.3
 github.com/konsorten/go-windows-terminal-sequences
-# github.com/mitchellh/mapstructure v0.0.0-20180203102830-a4e142e9c047
+# github.com/magiconair/properties v1.8.1
+github.com/magiconair/properties
+# github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
+# github.com/pelletier/go-toml v1.4.0
+github.com/pelletier/go-toml
 # github.com/pkg/errors v0.8.1
 github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
@@ -75,9 +92,23 @@ github.com/satori/go.uuid
 # github.com/sirupsen/logrus v1.6.0
 ## explicit
 github.com/sirupsen/logrus
+# github.com/spf13/afero v1.1.2
+github.com/spf13/afero
+github.com/spf13/afero/mem
+# github.com/spf13/cast v1.3.0
+github.com/spf13/cast
+# github.com/spf13/jwalterweatherman v1.0.0
+github.com/spf13/jwalterweatherman
+# github.com/spf13/pflag v1.0.3
+github.com/spf13/pflag
+# github.com/spf13/viper v1.7.1
+## explicit
+github.com/spf13/viper
 # github.com/stretchr/testify v1.6.0
 ## explicit
 github.com/stretchr/testify/assert
+# github.com/subosito/gotenv v1.2.0
+github.com/subosito/gotenv
 # github.com/vektah/gqlparser/v2 v2.0.1
 ## explicit
 github.com/vektah/gqlparser/v2
@@ -315,6 +346,10 @@ google.golang.org/protobuf/types/known/anypb
 google.golang.org/protobuf/types/known/durationpb
 google.golang.org/protobuf/types/known/timestamppb
 google.golang.org/protobuf/types/pluginpb
+# gopkg.in/ini.v1 v1.51.0
+gopkg.in/ini.v1
+# gopkg.in/yaml.v2 v2.2.4
+gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 gopkg.in/yaml.v3
 # honnef.co/go/tools v0.0.1-2020.1.4

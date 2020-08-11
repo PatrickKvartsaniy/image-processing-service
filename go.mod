@@ -8,6 +8,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.6.0
+	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.0
 	github.com/vektah/gqlparser/v2 v2.0.1
 	go.mongodb.org/mongo-driver v1.3.6
