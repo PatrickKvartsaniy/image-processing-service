@@ -9,9 +9,9 @@ import (
 func TestImage_IncreaseVersion(t *testing.T) {
 	var img model.Image
 	img.IncreaseVersion()
-	assert.Equal(t, 1, img.Version)
+	assert.Equal(t, int64(1), img.Version)
 	img.IncreaseVersion()
-	assert.Equal(t, 2, img.Version)
+	assert.Equal(t, int64(2), img.Version)
 }
 
 func TestImage_NewSize(t *testing.T) {

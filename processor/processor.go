@@ -12,11 +12,11 @@ func New() *Processor {
 	return &Processor{}
 }
 
-func (p Processor) Resize(in io.Reader, out io.Writer, params model.SizeInput) error {
-	original, err := imaging.Decode(in, imaging.AutoOrientation(true))
+func (p Processor) Resize(data io.Reader, output io.Writer, parameters model.SizeInput) error {
+	original, err := imaging.Decode(data, imaging.AutoOrientation(true))
 	if err != nil {
 		return err
 	}
-	resized := imaging.Resize(original, params.Width, params.Height, imaging.Lanczos)
-	return imaging.Encode(out, resized, imaging.PNG)
+	resized := imaging.Resize(original, parameters.Width, parameters.Height, imaging.Lanczos)
+	return imaging.Encode(output, resized, imaging.PNG)
 }

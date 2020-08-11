@@ -56,7 +56,7 @@ func (r Repository) GetImage(ctx context.Context, id string) (*model.Image, erro
 	return &i, nil
 }
 
-func (r Repository) ListImages(ctx context.Context, limit, offset int64) ([]*model.Image, error) {
+func (r Repository) GetMultipleImages(ctx context.Context, limit, offset int64) ([]*model.Image, error) {
 	cur, err := r.collection.Find(ctx, bson.D{}, findOptions(limit, offset))
 	if err != nil {
 		return nil, processError(err)

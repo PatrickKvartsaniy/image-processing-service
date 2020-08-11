@@ -30,7 +30,7 @@ type (
 		Upload(ctx context.Context, data io.Reader) (string, error)
 	}
 	Processor interface {
-		Resize(ctx context.Context, data io.Reader, output io.Writer, parameters model.SizeInput) error
+		Resize(data io.Reader, output io.Writer, parameters model.SizeInput) error
 	}
 	Validator interface {
 		ValidateFile(in graphql.Upload) error
@@ -38,7 +38,7 @@ type (
 	}
 )
 
-func NewGraphqlResolver(s Storage, p Processor, r Repository, imageSizeLimit int64) *Resolver {
+func NewGraphqlResolver(s Storage, p Processor, r Repository, imageSizeLimit int) *Resolver {
 	return &Resolver{
 		storage:   s,
 		processor: p,

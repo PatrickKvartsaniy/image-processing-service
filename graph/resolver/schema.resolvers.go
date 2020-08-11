@@ -30,7 +30,7 @@ func (r *mutationResolver) Upload(ctx context.Context, image graphql.Upload, par
 	}
 
 	var resized bytes.Buffer
-	if err = r.processor.Resize(ctx, cp, &resized, parameters); err != nil {
+	if err = r.processor.Resize(cp, &resized, parameters); err != nil {
 		return nil, fmt.Errorf("resizing image: %w", err)
 	}
 
@@ -69,7 +69,7 @@ func (r *mutationResolver) Resize(ctx context.Context, id string, parameters mod
 	}
 
 	var resized bytes.Buffer
-	if err = r.processor.Resize(ctx, orig, &resized, parameters); err != nil {
+	if err = r.processor.Resize(orig, &resized, parameters); err != nil {
 		return nil, fmt.Errorf("resizing image: %w", err)
 	}
 

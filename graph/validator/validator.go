@@ -9,11 +9,11 @@ import (
 var allowedTypes = [5]string{"image/jpeg", "image/gif", "image/png", "image/pdf", "image/ico"}
 
 type Validator struct {
-	maxImageSize int64
+	maxImageSize int
 }
 
 // maxImageSize - size in megabytes
-func NewFileValidator(maxImageSize int64) *Validator {
+func NewFileValidator(maxImageSize int) *Validator {
 	return &Validator{
 		maxImageSize: maxImageSize * 1024 * 1024,
 	}
@@ -23,7 +23,7 @@ func (v Validator) ValidateFile(in graphql.Upload) error {
 	if !isImage(in.ContentType) {
 		return errors.UnsupportedFile
 	}
-	if in.Size > v.maxImageSize {
+	if int(in.Size) > v.maxImageSize {
 		return errors.TooLarge
 	}
 	return nil
