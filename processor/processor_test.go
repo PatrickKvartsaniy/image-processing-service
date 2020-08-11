@@ -11,7 +11,7 @@ import (
 )
 
 func TestProcessor_Resize(t *testing.T) {
-	proc := processor.NewImageProcessor()
+	proc := processor.New()
 	src, err := os.Open("testdata/gopher.png")
 	assert.NoError(t, err)
 

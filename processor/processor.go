@@ -8,7 +8,7 @@ import (
 
 type Processor struct{}
 
-func NewImageProcessor() *Processor {
+func New() *Processor {
 	return &Processor{}
 }
 

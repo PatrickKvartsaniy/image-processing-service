@@ -29,7 +29,7 @@ type (
 	}
 )
 
-func NewMongoRepository(ctx context.Context, cfg Config) (*Repository, error) {
+func New(ctx context.Context, cfg Config) (*Repository, error) {
 	clientOptions := options.Client().ApplyURI(buildMongoURI(cfg))
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
@@ -65,7 +65,7 @@ func (r Repository) ListImages(ctx context.Context, limit, offset int64) ([]*mod
 	var images []*model.Image
 	for cur.Next(ctx) {
 		var img model.Image
-		if err := cur.Decode(&img); err != nil{
+		if err := cur.Decode(&img); err != nil {
 			return nil, processError(err)
 		}
 		images = append(images, &img)
@@ -108,8 +108,8 @@ func (r Repository) UpdateImage(ctx context.Context, image *model.Image) error {
 	return nil
 }
 
-func (r Repository) Close(ctx context.Context) {
-	if err := r.client.Disconnect(ctx); err != nil {
+func (r Repository) Close() {
+	if err := r.client.Disconnect(context.TODO()); err != nil {
 		logrus.Error(err)
 	}
 }
