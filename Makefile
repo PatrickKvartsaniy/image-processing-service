@@ -30,4 +30,4 @@ lint:
 
 .PHONY: dockerise
 dockerise:
-	docker build
+	docker build .
