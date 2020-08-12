@@ -2,6 +2,8 @@ export GO111MODULE=on
 export GOSUMDB=off
 export GOPROXY=direct
 
+DOCKER_REPO = eu.gcr.io/image-resizing-285809
+
 .PHONY: all
 all: deps gen build lint test dockerise
 
@@ -30,4 +32,4 @@ lint:
 
 .PHONY: dockerise
 dockerise:
-	docker build -t image-processing-service .
+	docker build -t "${DOCKER_REPO}/image-processing-service" .

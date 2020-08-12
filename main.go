@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/PatrickKvartsaniy/image-processing-service/config"
 	"github.com/PatrickKvartsaniy/image-processing-service/graph"
 	"github.com/PatrickKvartsaniy/image-processing-service/graph/resolver"
+	"github.com/PatrickKvartsaniy/image-processing-service/health"
 	"github.com/PatrickKvartsaniy/image-processing-service/processor"
 	"github.com/PatrickKvartsaniy/image-processing-service/repository/mongo"
 	"github.com/PatrickKvartsaniy/image-processing-service/storage"
@@ -18,28 +20,42 @@ import (
 
 func main() {
 	cfg := config.ReadOS()
-	initlogger(cfg.LogLevel, cfg.PrettyLogOutput)
+	initLogger(cfg.LogLevel, cfg.PrettyLogOutput)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	setupGracefulShutdown(cancel)
+	if err := run(ctx, cfg); err != nil {
+		cancel()
+		logrus.WithError(err).Fatal("closing service with error")
+	}
+}
 
+func run(ctx context.Context, cfg config.Config) error {
 	s, err := storage.New(ctx, cfg.Storage)
 	if err != nil {
-		logrus.WithError(err).Error("connecting to storage")
+		return fmt.Errorf("connecting to the storage: %w", err)
 	}
 	defer s.Close()
 
 	repo, err := mongo.New(ctx, cfg.Mongo)
 	if err != nil {
-		logrus.WithError(err).Error("connecting to mongo")
+		return fmt.Errorf("connecting to the mongo: %w", err)
 	}
 	defer repo.Close()
 
-	p := processor.New()
-	res := resolver.NewGraphqlResolver(s, p, repo, cfg.MaxImageSize)
+	res := resolver.NewGraphqlResolver(s, processor.New(), repo, cfg.MaxImageSize)
 	srv := graph.CreateAndRun(cfg.GraphQLPort, res)
 	defer closeWithTimeout(srv.Close, time.Second*5)
+
+	healthCheck := health.CreateAndRun(cfg.HealthCHeckPort, []health.Check{
+		repo.HealthCheck,
+		srv.HealthCheck,
+	})
+	defer closeWithTimeout(healthCheck.Close, 5*time.Second)
+
 	<-ctx.Done()
+
+	return nil
 }
 
 func closeWithTimeout(close func(context.Context), d time.Duration) {
@@ -58,7 +74,7 @@ func setupGracefulShutdown(stop func()) {
 	}()
 }
 
-func initlogger(logLevel string, pretty bool) {
+func initLogger(logLevel string, pretty bool) {
 	if pretty {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	}

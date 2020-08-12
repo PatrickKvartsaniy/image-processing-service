@@ -39,11 +39,7 @@ func (s *Server) setupHandlers() {
 	}))
 
 	h := http.NewServeMux()
-	h.Handle("/query", correlationID(
-		loggingMiddleware(
-			authMiddleware(srv),
-		),
-	))
+	h.Handle("/query", correlationID(loggingMiddleware(srv)))
 	s.http.Handler = h
 }
 
@@ -78,21 +74,6 @@ func (s *Server) HealthCheck() error {
 		return errors.New("http service: resolver nil")
 	}
 	return nil
-}
-
-func authMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if token := req.Header.Get("Authorization"); token != "" {
-			ctx := req.Context()
-
-			ctx = context.WithValue(ctx, "Authorization", token) // nolint
-			ctx = metadata.AppendToOutgoingContext(ctx, "Authorization", token)
-
-			req = req.WithContext(ctx)
-		}
-
-		next.ServeHTTP(w, req)
-	})
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {
