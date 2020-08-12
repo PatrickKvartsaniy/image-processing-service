@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"time"
 
@@ -15,10 +14,7 @@ import (
 
 type (
 	Config struct {
-		Host       string
-		Port       int
-		User       string
-		Password   string
+		URI        string
 		Database   string
 		Collection string
 	}
@@ -30,7 +26,7 @@ type (
 )
 
 func New(ctx context.Context, cfg Config) (*Repository, error) {
-	clientOptions := options.Client().ApplyURI(buildMongoURI(cfg))
+	clientOptions := options.Client().ApplyURI(cfg.URI)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		return nil, err
@@ -126,14 +122,6 @@ func findOptions(limit, offset int64) *options.FindOptions {
 	findOptions.SetLimit(limit)
 	findOptions.SetSkip(offset)
 	return findOptions
-}
-
-func buildMongoURI(config Config) string {
-	return fmt.Sprintf("%s://%v:%v@%v",
-		"mongodb",
-		config.User,
-		config.Password,
-		config.Host)
 }
 
 func processError(err error) error {
