@@ -93,7 +93,6 @@ func (r Repository) UpdateImage(ctx context.Context, image *model.Image) error {
 
 	filter := bson.D{
 		{Key: "_id", Value: image.ID},
-		{Key: "version", Value: image.Version},
 	}
 
 	_, err := r.collection.UpdateOne(ctx, filter, bson.D{{Key: "$set", Value: *image}}, options.Update())
