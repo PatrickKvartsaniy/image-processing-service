@@ -30,8 +30,8 @@ func New(ctx context.Context, cfg Config) (*Storage, error) {
 	}, nil
 }
 
-func (s Storage) Read(ctx context.Context, name string) (io.Reader, error) {
-	obj := s.bucket.Object(name)
+func (s Storage) Read(ctx context.Context, path string) (io.Reader, error) {
+	obj := s.bucket.Object(path)
 	r, err := obj.NewReader(ctx)
 	if err != nil {
 		return nil, err
@@ -46,8 +46,8 @@ func (s Storage) Read(ctx context.Context, name string) (io.Reader, error) {
 	return &b, nil
 }
 
-func (s Storage) Upload(ctx context.Context, data io.Reader) (string, error) {
-	obj := s.bucket.Object(uuid.NewV4().String() + ".png")
+func (s Storage) Upload(ctx context.Context, data io.Reader, extension string) (string, error) {
+	obj := s.bucket.Object(uuid.NewV4().String() + extension)
 	w := obj.NewWriter(ctx)
 	if _, err := io.Copy(w, data); err != nil {
 		return "", err

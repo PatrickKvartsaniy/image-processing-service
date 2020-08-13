@@ -25,7 +25,7 @@ func (r *mutationResolver) Upload(ctx context.Context, image graphql.Upload, par
 	}
 
 	cp, orig := copyReader(image.File)
-	path, err := r.storage.Upload(ctx, orig)
+	path, err := r.storage.Upload(ctx, orig, getImageExtension(image.ContentType))
 	if err != nil {
 		return nil, fmt.Errorf("uploading original image: %w", err)
 	}
@@ -35,7 +35,7 @@ func (r *mutationResolver) Upload(ctx context.Context, image graphql.Upload, par
 		return nil, fmt.Errorf("resizing image: %w", err)
 	}
 
-	resizedPath, err := r.storage.Upload(ctx, &resized)
+	resizedPath, err := r.storage.Upload(ctx, &resized, getImageExtension(image.ContentType))
 	if err != nil {
 		return nil, fmt.Errorf("uploading resized image: %w", err)
 	}
@@ -75,7 +75,7 @@ func (r *mutationResolver) Resize(ctx context.Context, id string, parameters mod
 		return nil, fmt.Errorf("resizing image: %w", err)
 	}
 
-	resizedPath, err := r.storage.Upload(ctx, &resized)
+	resizedPath, err := r.storage.Upload(ctx, &resized, getImageExtension(image.Type))
 	if err != nil {
 		return nil, fmt.Errorf("uploading resized image: %w", err)
 	}

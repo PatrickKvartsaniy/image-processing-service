@@ -15,15 +15,19 @@ type Image struct {
 }
 
 func (i *Image) NewSize(path string, params SizeInput) {
-	i.Variety = append(i.Variety, Resized{
-		Path:   path,
-		Width:  params.Width,
-		Height: params.Height,
-	})
+	if i != nil {
+		i.Variety = append(i.Variety, Resized{
+			Path:   path,
+			Width:  params.Width,
+			Height: params.Height,
+		})
+	}
 }
 
 func (i *Image) IncreaseVersion() {
-	i.Version++
+	if i != nil {
+		i.Version++
+	}
 }
 
 type Resized struct {

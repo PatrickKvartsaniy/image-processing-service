@@ -26,7 +26,7 @@ type (
 	}
 	Storage interface {
 		Read(ctx context.Context, path string) (io.Reader, error)
-		Upload(ctx context.Context, data io.Reader) (string, error)
+		Upload(ctx context.Context, data io.Reader, extension string) (string, error)
 	}
 	Processor interface {
 		Resize(data io.Reader, output io.Writer, parameters model.SizeInput) error
