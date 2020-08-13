@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/PatrickKvartsaniy/image-processing-service/graph/resolver"
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -20,12 +21,12 @@ type Server struct {
 	readiness bool
 }
 
-func CreateAndRun(port int, resolver generated.ResolverRoot) *Server {
+func CreateAndRun(port int, s resolver.Storage, p resolver.Processor, r resolver.Repository, imageSizeLimit int) *Server {
 	service := &Server{
 		http: &http.Server{
 			Addr: fmt.Sprintf(":%d", port),
 		},
-		resolver: resolver,
+		resolver: resolver.NewGraphqlResolver(s, p, r, imageSizeLimit),
 	}
 
 	service.setupHandlers()

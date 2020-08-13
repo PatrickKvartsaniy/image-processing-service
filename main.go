@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/PatrickKvartsaniy/image-processing-service/config"
 	"github.com/PatrickKvartsaniy/image-processing-service/graph"
-	"github.com/PatrickKvartsaniy/image-processing-service/graph/resolver"
 	"github.com/PatrickKvartsaniy/image-processing-service/health"
 	"github.com/PatrickKvartsaniy/image-processing-service/processor"
 	"github.com/PatrickKvartsaniy/image-processing-service/repository/mongo"
@@ -43,8 +42,7 @@ func run(ctx context.Context, cfg config.Config) error {
 	}
 	defer repo.Close()
 
-	res := resolver.NewGraphqlResolver(s, processor.New(), repo, cfg.MaxImageSize)
-	srv := graph.CreateAndRun(cfg.GraphQLPort, res)
+	srv := graph.CreateAndRun(cfg.GraphQLPort, s, processor.New(), repo, cfg.MaxImageSize)
 	defer closeWithTimeout(srv.Close, time.Second*5)
 
 	healthCheck := health.CreateAndRun(cfg.HealthCHeckPort, []health.Check{
