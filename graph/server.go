@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/PatrickKvartsaniy/image-processing-service/graph/resolver"
+	"github.com/PatrickKvartsaniy/image-processing-service/graph/validator"
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -22,11 +23,12 @@ type Server struct {
 }
 
 func CreateAndRun(port int, s resolver.Storage, p resolver.Processor, r resolver.Repository, imageSizeLimit int) *Server {
+	v := validator.NewFileValidator(imageSizeLimit)
 	service := &Server{
 		http: &http.Server{
 			Addr: fmt.Sprintf(":%d", port),
 		},
-		resolver: resolver.NewGraphqlResolver(s, p, r, imageSizeLimit),
+		resolver: resolver.NewGraphqlResolver(s, p, r, v),
 	}
 
 	service.setupHandlers()

@@ -3,7 +3,6 @@ package resolver
 import (
 	"context"
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/PatrickKvartsaniy/image-processing-service/graph/validator"
 	"github.com/PatrickKvartsaniy/image-processing-service/model"
 	"io"
 )
@@ -38,11 +37,11 @@ type (
 	}
 )
 
-func NewGraphqlResolver(s Storage, p Processor, r Repository, imageSizeLimit int) *Resolver {
+func NewGraphqlResolver(s Storage, p Processor, r Repository, v Validator) *Resolver {
 	return &Resolver{
 		storage:   s,
 		processor: p,
 		repo:      r,
-		validator: validator.NewFileValidator(imageSizeLimit),
+		validator: v,
 	}
 }
