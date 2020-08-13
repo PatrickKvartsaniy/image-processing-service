@@ -28,13 +28,13 @@ func (i *Image) IncreaseVersion() {
 
 type Resized struct {
 	Path   string `json:"path" bson:"path"`
-	Width  int    `json:"width" bson:"width"`
-	Height int    `json:"height" bson:"height"`
+	Width  int64  `json:"width" bson:"width"`
+	Height int64  `json:"height" bson:"height"`
 }
 
 type SizeInput struct {
-	Width  int `json:"width"`
-	Height int `json:"height"`
+	Width  int64 `json:"width"`
+	Height int64 `json:"height"`
 }
 
 func (si SizeInput) Valid() bool {

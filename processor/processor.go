@@ -17,6 +17,6 @@ func (p Processor) Resize(data io.Reader, output io.Writer, parameters model.Siz
 	if err != nil {
 		return err
 	}
-	resized := imaging.Resize(original, parameters.Width, parameters.Height, imaging.Lanczos)
+	resized := imaging.Resize(original, int(parameters.Width),int(parameters.Height), imaging.Lanczos)
 	return imaging.Encode(output, resized, imaging.PNG)
 }
