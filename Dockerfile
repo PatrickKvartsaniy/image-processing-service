@@ -8,6 +8,9 @@ RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -a
 FROM scratch
 
 # Copy our static executable
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+# Copy our static executable
 COPY --from=builder /app/bin/svc /svc
 
 # Port on which the service will be exposed.
