@@ -25,13 +25,13 @@ func (r *mutationResolver) Upload(ctx context.Context, image graphql.Upload, par
 	}
 
 	cp, orig := copyReader(image.File)
-	path, url, err := r.storage.Upload(ctx, orig, getImageExtension(image.ContentType))
+	path, url, err := r.storage.Upload(ctx, cp, getImageExtension(image.ContentType))
 	if err != nil {
 		return nil, fmt.Errorf("uploading original image: %w", err)
 	}
 
 	var resized bytes.Buffer
-	if err = r.processor.Resize(cp, &resized, parameters); err != nil {
+	if err = r.processor.Resize(orig, &resized, parameters); err != nil {
 		return nil, fmt.Errorf("resizing image: %w", err)
 	}
 
