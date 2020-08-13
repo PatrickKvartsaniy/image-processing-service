@@ -28,6 +28,8 @@ func CreateAndRun(port int, resolver generated.ResolverRoot) *Server {
 		resolver: resolver,
 	}
 
+	service.setupHandlers()
+
 	service.run()
 
 	return service
