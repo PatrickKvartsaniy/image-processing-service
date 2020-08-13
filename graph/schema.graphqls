@@ -3,6 +3,7 @@ scalar Upload
 
 type Image @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service/model.Image"){
     id: ID!
+    url: String!
     path: String!
     type: String!
     size: Int!
@@ -13,6 +14,7 @@ type Image @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service
 
 type Resized @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service/model.Resized"){
     path: String!
+    url: String!
     width: Int!
     height: Int!
 }

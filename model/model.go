@@ -7,6 +7,7 @@ import (
 type Image struct {
 	ID      string    `json:"id" bson:"_id"`
 	Path    string    `json:"path" bson:"path"`
+	URL     string    `json:"url" bson:"url"`
 	Type    string    `json:"extension" bson:"extension"`
 	Size    int64     `json:"size" bson:"size"`
 	Ts      time.Time `json:"ts" bson:"ts"`
@@ -14,10 +15,17 @@ type Image struct {
 	Variety []Resized `json:"variety" bson:"variety"`
 }
 
-func (i *Image) NewSize(path string, params SizeInput) {
+func (i *Image) SetMediaLink(url string) {
+	if i != nil {
+		i.URL = url
+	}
+}
+
+func (i *Image) NewSize(path string, url string, params SizeInput) {
 	if i != nil {
 		i.Variety = append(i.Variety, Resized{
 			Path:   path,
+			URL:    url,
 			Width:  params.Width,
 			Height: params.Height,
 		})
@@ -32,6 +40,7 @@ func (i *Image) IncreaseVersion() {
 
 type Resized struct {
 	Path   string `json:"path" bson:"path"`
+	URL    string `json:"url" bson:"url"`
 	Width  int64  `json:"width" bson:"width"`
 	Height int64  `json:"height" bson:"height"`
 }

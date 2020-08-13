@@ -50,6 +50,7 @@ type ComplexityRoot struct {
 		Size    func(childComplexity int) int
 		Ts      func(childComplexity int) int
 		Type    func(childComplexity int) int
+		URL     func(childComplexity int) int
 		Variety func(childComplexity int) int
 		Version func(childComplexity int) int
 	}
@@ -66,6 +67,7 @@ type ComplexityRoot struct {
 	Resized struct {
 		Height func(childComplexity int) int
 		Path   func(childComplexity int) int
+		URL    func(childComplexity int) int
 		Width  func(childComplexity int) int
 	}
 }
@@ -127,6 +129,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Image.Type(childComplexity), true
+
+	case "Image.url":
+		if e.complexity.Image.URL == nil {
+			break
+		}
+
+		return e.complexity.Image.URL(childComplexity), true
 
 	case "Image.variety":
 		if e.complexity.Image.Variety == nil {
@@ -191,6 +200,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Resized.Path(childComplexity), true
+
+	case "Resized.url":
+		if e.complexity.Resized.URL == nil {
+			break
+		}
+
+		return e.complexity.Resized.URL(childComplexity), true
 
 	case "Resized.width":
 		if e.complexity.Resized.Width == nil {
@@ -268,6 +284,7 @@ scalar Upload
 
 type Image @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service/model.Image"){
     id: ID!
+    url: String!
     path: String!
     type: String!
     size: Int!
@@ -278,6 +295,7 @@ type Image @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service
 
 type Resized @goModel(model:"github.com/PatrickKvartsaniy/image-processing-service/model.Resized"){
     path: String!
+    url: String!
     width: Int!
     height: Int!
 }
@@ -461,6 +479,40 @@ func (ec *executionContext) _Image_id(ctx context.Context, field graphql.Collect
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Image_url(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Image",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Image_path(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
@@ -877,6 +929,40 @@ func (ec *executionContext) _Resized_path(ctx context.Context, field graphql.Col
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Path, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Resized_url(ctx context.Context, field graphql.CollectedField, obj *model.Resized) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Resized",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2064,6 +2150,11 @@ func (ec *executionContext) _Image(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "url":
+			out.Values[i] = ec._Image_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "path":
 			out.Values[i] = ec._Image_path(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2198,6 +2289,11 @@ func (ec *executionContext) _Resized(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = graphql.MarshalString("Resized")
 		case "path":
 			out.Values[i] = ec._Resized_path(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "url":
+			out.Values[i] = ec._Resized_url(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

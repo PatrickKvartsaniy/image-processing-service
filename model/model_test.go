@@ -34,7 +34,7 @@ func TestImage_NewSize(t *testing.T) {
 		},
 	}
 	var img model.Image
-	img.NewSize(tc.newPath, tc.newSize)
+	img.NewSize(tc.newPath, "", tc.newSize)
 	assert.Equal(t, tc.expected, img.Variety)
 }
 

@@ -7,12 +7,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	uuid "github.com/satori/go.uuid"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/PatrickKvartsaniy/image-processing-service/graph/generated"
 	"github.com/PatrickKvartsaniy/image-processing-service/model"
+	"github.com/satori/go.uuid"
 )
 
 func (r *mutationResolver) Upload(ctx context.Context, image graphql.Upload, parameters model.SizeInput) (*model.Image, error) {
@@ -25,7 +25,7 @@ func (r *mutationResolver) Upload(ctx context.Context, image graphql.Upload, par
 	}
 
 	cp, orig := copyReader(image.File)
-	path, err := r.storage.Upload(ctx, orig, getImageExtension(image.ContentType))
+	path, url, err := r.storage.Upload(ctx, orig, getImageExtension(image.ContentType))
 	if err != nil {
 		return nil, fmt.Errorf("uploading original image: %w", err)
 	}
@@ -35,19 +35,20 @@ func (r *mutationResolver) Upload(ctx context.Context, image graphql.Upload, par
 		return nil, fmt.Errorf("resizing image: %w", err)
 	}
 
-	resizedPath, err := r.storage.Upload(ctx, &resized, getImageExtension(image.ContentType))
+	resizedPath, resizedURL, err := r.storage.Upload(ctx, &resized, getImageExtension(image.ContentType))
 	if err != nil {
 		return nil, fmt.Errorf("uploading resized image: %w", err)
 	}
 
 	img := &model.Image{
 		ID:   uuid.NewV4().String(),
+		URL:  url,
 		Path: path,
 		Type: image.ContentType,
 		Size: image.Size,
 		Ts:   time.Now(),
 	}
-	img.NewSize(resizedPath, parameters)
+	img.NewSize(resizedPath, resizedURL, parameters)
 
 	if err := r.repo.SaveImage(ctx, img); err != nil {
 		return nil, fmt.Errorf("saving image: %w", err)
@@ -75,12 +76,12 @@ func (r *mutationResolver) Resize(ctx context.Context, id string, parameters mod
 		return nil, fmt.Errorf("resizing image: %w", err)
 	}
 
-	resizedPath, err := r.storage.Upload(ctx, &resized, getImageExtension(image.Type))
+	resizedPath, resizedURL, err := r.storage.Upload(ctx, &resized, getImageExtension(image.Type))
 	if err != nil {
 		return nil, fmt.Errorf("uploading resized image: %w", err)
 	}
 
-	image.NewSize(resizedPath, parameters)
+	image.NewSize(resizedPath, resizedURL, parameters)
 	image.IncreaseVersion()
 
 	if err = r.repo.UpdateImage(ctx, image); err != nil {

@@ -46,16 +46,20 @@ func (s Storage) Read(ctx context.Context, path string) (io.Reader, error) {
 	return &b, nil
 }
 
-func (s Storage) Upload(ctx context.Context, data io.Reader, extension string) (string, error) {
+func (s Storage) Upload(ctx context.Context, data io.Reader, extension string) (string, string, error) {
 	obj := s.bucket.Object(uuid.NewV4().String() + extension)
 	w := obj.NewWriter(ctx)
 	if _, err := io.Copy(w, data); err != nil {
-		return "", err
+		return "", "", err
 	}
 	if err := w.Close(); err != nil {
 		logrus.Error(err)
 	}
-	return obj.ObjectName(), nil
+	attr, err := obj.Attrs(ctx)
+	if err != nil {
+		return "", "", err
+	}
+	return attr.Name, attr.MediaLink, nil
 }
 
 func (s Storage) Close() {
