@@ -47,7 +47,7 @@ func (s Storage) Read(ctx context.Context, name string) (io.Reader, error) {
 }
 
 func (s Storage) Upload(ctx context.Context, data io.Reader) (string, error) {
-	obj := s.bucket.Object(uuid.NewV4().String())
+	obj := s.bucket.Object(uuid.NewV4().String() + ".png")
 	w := obj.NewWriter(ctx)
 	if _, err := io.Copy(w, data); err != nil {
 		return "", err
