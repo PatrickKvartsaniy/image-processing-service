@@ -50,7 +50,7 @@ func (s *Server) run() {
 		log.Debug("graphql service: addr=", s.http.Addr)
 		if err := s.http.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			s.runErr = err
-			log.WithError(err).Error("graphql service: end run")
+			log.WithError(err).Error("graphql service")
 		}
 	}()
 	s.readiness = true
@@ -60,7 +60,7 @@ func (s *Server) Close(ctx context.Context) {
 	if err := s.http.Shutdown(ctx); err != nil {
 		log.WithError(err).Error("stopping graphql service")
 	}
-	log.Info("graphql service: stopped")
+	log.Info("graphql service stopped")
 }
 
 func (s *Server) HealthCheck() error {
@@ -69,9 +69,6 @@ func (s *Server) HealthCheck() error {
 	}
 	if s.runErr != nil {
 		return errors.New("http service: run issue")
-	}
-	if s.resolver == nil {
-		return errors.New("http service: resolver nil")
 	}
 	return nil
 }

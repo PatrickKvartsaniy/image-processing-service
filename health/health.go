@@ -42,13 +42,13 @@ func (s *Server) setupHandlers() {
 }
 
 func (s *Server) run() {
-	logrus.Info("health check service: begin run")
+	logrus.Info("health check starting")
 
 	go func() {
 		logrus.Debug("health check service: addr=", s.http.Addr)
 		if err := s.http.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			s.runErr = err
-			logrus.WithError(err).Error("health check service: end run")
+			logrus.WithError(err).Error("health check service")
 		}
 	}()
 
@@ -59,7 +59,7 @@ func (s *Server) Close(ctx context.Context) {
 	if err := s.http.Shutdown(ctx); err != nil {
 		logrus.WithError(err).Error("health check service shutdown")
 	}
-	logrus.Info("health check service: stopped")
+	logrus.Info("health check service stopped")
 }
 
 func (s *Server) serve(w http.ResponseWriter, _ *http.Request) {

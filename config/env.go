@@ -17,6 +17,9 @@ func ReadOS() Config {
 	viper.SetDefault("GRAPH_QL_PORT", 8080)
 	viper.SetDefault("HEALTH_CHECK_PORT", 8888)
 
+	viper.SetDefault("MAX_IMAGE_SIZE", 10)
+	viper.SetDefault("MONGO_COLLECTION", "images")
+
 	return Config{
 		PrettyLogOutput: viper.GetBool("PRETTY_LOG_OUTPUT"),
 		LogLevel:        viper.GetString("LOG_LEVEL"),
