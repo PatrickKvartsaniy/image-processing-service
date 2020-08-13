@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	uuid "github.com/satori/go.uuid"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -40,6 +41,7 @@ func (r *mutationResolver) Upload(ctx context.Context, image graphql.Upload, par
 	}
 
 	img := &model.Image{
+		ID:   uuid.NewV4().String(),
 		Path: path,
 		Type: image.ContentType,
 		Size: image.Size,
